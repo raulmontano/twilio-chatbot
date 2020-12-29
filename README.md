@@ -141,3 +141,6 @@ A **key word** has been created to allow users close the chat when it has been e
 
 ### DEPENDENCIES
 This application imports `inbenta/chatbot-api-connector` as a Composer dependency, that includes `symfony/http-foundation@^3.1` and `guzzlehttp/guzzle@~6.0` as dependencies too.
+
+### TWILIO PROCESS
+To get started with the integration, you must have a [Twilio](https://www.twilio.com/) account. Inside the Twilio dashboard you can find the "**Account SID**" and the "**Auth Token**", as well as additional settings. To learn more about it, you can refer to the file [Instructions.pdf](https://github.com/inbenta-integrations/twilio-chatbot/blob/master/Instructions.pdf), into the section "Prepare the Twilio environment".
