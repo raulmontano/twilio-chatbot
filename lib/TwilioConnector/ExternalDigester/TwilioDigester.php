@@ -4,7 +4,6 @@ namespace Inbenta\TwilioConnector\ExternalDigester;
 
 use \Exception;
 use Inbenta\ChatbotConnector\ExternalDigester\Channels\DigesterInterface;
-use Inbenta\TwilioConnector\Helpers\Helper;
 
 class TwilioDigester extends DigesterInterface
 {
@@ -104,11 +103,7 @@ class TwilioDigester extends DigesterInterface
                     } else if (isset($option->escalate)) {
                         $isEscalation = true;
                     }
-
-                    if (
-                        $userMessage == $option->opt_key ||
-                        Helper::removeAccentsToLower($userMessage) === Helper::removeAccentsToLower($this->langManager->translate($option->label))
-                    ) {
+                    if ($userMessage == $option->opt_key || strtolower($userMessage) == strtolower($option->label)) {
                         if ($isListValues || $isRelatedContent || (isset($option->attributes) && isset($option->attributes->DYNAMIC_REDIRECT) && $option->attributes->DYNAMIC_REDIRECT == 'escalationStart')) {
                             $selectedOptionText = $option->label;
                         } else if ($isEscalation) {
@@ -124,22 +119,15 @@ class TwilioDigester extends DigesterInterface
 
                 if (!$optionSelected) {
                     if ($isListValues) { //Set again options for variable
-                        if ($this->session->get('optionListValues', 0) < 1) { //Make sure only enters here just once
-                            $this->session->set('options', $options);
-                            $this->session->set('lastUserQuestion', $lastUserQuestion);
-                            $this->session->set('optionListValues', 1);
-                        } else {
-                            $this->session->delete('options');
-                            $this->session->delete('lastUserQuestion');
-                            $this->session->delete('optionListValues');
-                        }
+                        $this->session->set('options', $options);
+                        $this->session->set('lastUserQuestion', $lastUserQuestion);
                     } else if ($isPolar) { //For polar, on wrong answer, goes for NO
                         $request['Body'] = "No";
                     }
                 }
 
                 if ($selectedOption) {
-                    $output[] = ['option' => $selectedOption->value];
+                    $output[] = ['option' => $selectedOption->value, 'message' => $lastUserQuestion];
                 } else if ($selectedOptionText !== "") {
                     $output[] = ['message' => $selectedOptionText];
                 } else if ($isEscalation && $selectedEscalation !== "") {
@@ -156,7 +144,7 @@ class TwilioDigester extends DigesterInterface
             $output[0] = ['message' => $request['Body']];
 
             if (isset($request['MediaUrl0'])) {
-                $output[0] = $this->mediaFileToHyperchat($request);
+                $output[0] = ['message' => ''];
             }
         }
         return $output;
@@ -658,63 +646,5 @@ class TwilioDigester extends DigesterInterface
         $output['body'] = $message;
 
         return $output;
-    }
-
-    /**
-     * Check if Hyperchat is running and if the attached file is correct
-     * @param array $request
-     * @return array $output
-     */
-    protected function mediaFileToHyperchat(array $request)
-    {
-        $output = ['message' => ''];
-        if ($this->session->get('chatOnGoing', false)) {
-            $mediaFile = $this->getMediaFile($request['MediaUrl0'], $request['MediaContentType0']);
-            if ($mediaFile !== "") {
-                $output = ['media' => $mediaFile];
-            }
-        }
-        return $output;
-    }
-
-    /**
-     * Get the media file in from the Twilio response, 
-     * save file into temporal directory to sent to Hyperchat
-     * @param string $fileUrl
-     * @param string $mediaContent
-     */
-    protected function getMediaFile(string $fileUrl, string $mediaContent)
-    {
-        $format = explode("/", $mediaContent);
-        if (isset($format[1]) && in_array($format[1], $this->attachableFormats) ) {
-            $fileName = sys_get_temp_dir(). "/file.".$format[1];
-            $realUrl = $this->getRealUrl($fileUrl);
-            $tmpFile = fopen($fileName, "w") or die;
-            fwrite($tmpFile, file_get_contents($realUrl));
-            
-            return fopen($fileName, 'r');
-        }
-        return "";
-    }
-
-    /**
-     * Media files from Twilio are not showing with the direct URL
-     * With curl we get the URL of the redirection for the real URL
-     * @param string $fileUrl
-     * @return string $realUrl
-     */
-    protected function getRealUrl(string $fileUrl)
-    {
-        $realUrl = "";
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $fileUrl);
-        curl_setopt($ch, CURLOPT_HEADER, TRUE);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, FALSE);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        $result = curl_exec($ch);
-        if (preg_match('#Location: (.*)#', $result, $uri)) {
-            $realUrl = isset($uri[1]) ? trim($uri[1]) : "";
-        }
-        return $realUrl;
     }
 }
