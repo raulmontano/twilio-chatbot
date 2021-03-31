@@ -13,7 +13,7 @@ class TwilioDigester extends DigesterInterface
     protected $langManager;
     protected $session;
     protected $isWhatsappRequest = false;
-    protected $attachableFormats = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'xls', 'xlsx', 'mp4', 'avi', 'mp3'];
+    protected $attachableFormats = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'mp4', 'avi', 'mp3'];
 
     /**
      * Digester contructor
