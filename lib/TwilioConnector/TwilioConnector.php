@@ -157,7 +157,6 @@ class TwilioConnector extends ChatbotConnector
                 $this->chatClient->closeChat($chatData);
                 $this->externalClient->sendTextMessage($this->lang->translate('chat_closed'));
                 $this->session->set('chatOnGoing', false);
-                $this->session->delete('escalationForm');
             } else {
                 $this->sendMessagesToChat($digestedRequest);
             }
