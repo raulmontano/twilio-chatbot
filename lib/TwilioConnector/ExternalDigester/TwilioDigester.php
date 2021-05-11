@@ -268,6 +268,8 @@ class TwilioDigester extends DigesterInterface
             $messageTxt .= "\n" . $message->attributes->SIDEBUBBLE_TEXT;
         }
 
+        //FIXME
+
         $output = $this->handleMessageWithImgOrIframe($messageTxt);
         $this->handleMessageWithActionField($message, $messageTxt, $lastUserQuestion);
         $this->handleMessageWithRelatedContent($message, $messageTxt, $lastUserQuestion);
@@ -678,7 +680,7 @@ class TwilioDigester extends DigesterInterface
     }
 
     /**
-     * Get the media file in from the Twilio response, 
+     * Get the media file in from the Twilio response,
      * save file into temporal directory to sent to Hyperchat
      * @param string $fileUrl
      * @param string $mediaContent
