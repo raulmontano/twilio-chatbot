@@ -33,12 +33,22 @@ class TwilioAPIClient
 
         $this->from = isset($request['To']) ? $request['To'] : null;    //To > From
         $this->to = isset($request['From']) ? $request['From'] : null; //From > To
+
+        if($this->isWhatsapp){
+
+          $fullName = 'whatsapp.' . str_replace('whatsapp:+', '', $this->to);
+
+          $this->setFullName($fullName);
+          $this->setEmail($fullName . '@continua.twilio.com');
+          
+        }
+
     }
 
 
     /**
      * Build an external session Id using the following pattern:
-     * 
+     *
      * @return String|null
      */
     public static function buildExternalIdFromRequest()
