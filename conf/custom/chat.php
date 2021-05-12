@@ -11,13 +11,8 @@ return [
         'version' => '1',
         'appId' => '',
         'secret' => '',
-<<<<<<< HEAD
-        'roomId' => 1,             // Numeric value, no string (without quotes)
-        'lang' => 'en',
-=======
         'roomId' => 3,             // Numeric value, no string (without quotes)
         'lang' => 'es',
->>>>>>> dc6ddc8... remove keys
         'source' => 3,             // Numeric value, no string (without quotes)
         'guestName' => '',
         'guestContact' => '',
