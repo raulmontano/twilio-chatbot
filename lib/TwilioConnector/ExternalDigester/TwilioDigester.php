@@ -268,9 +268,33 @@ class TwilioDigester extends DigesterInterface
             $messageTxt .= "\n" . $message->attributes->SIDEBUBBLE_TEXT;
         }
 
-        //FIXME
+        $mediaAttribute = 'IMAGE_WHATSAPP';
 
+        if (isset($message->attributes->$mediaAttribute) && !empty($message->attributes->$mediaAttribute)) {
+            $mediaElements = explode(',',$message->attributes->$mediaAttribute);
+        } else {
+            $mediaElements = [];
+        }
+
+        //FIXME
         $output = $this->handleMessageWithImgOrIframe($messageTxt);
+
+        if(isset($output['extra']) && isset($output['extra']['mediaUrl'])){
+          //already exists
+        } else {
+            $output['extra'] = [
+                "mediaUrl" => []
+            ];
+        }
+
+        if(count($mediaElements) > 0 ){
+            foreach ($mediaElements as $element) {
+                $output['extra']["mediaUrl"][] = $element;
+            }
+        } else {
+          //empty
+        }
+
         $this->handleMessageWithActionField($message, $messageTxt, $lastUserQuestion);
         $this->handleMessageWithRelatedContent($message, $messageTxt, $lastUserQuestion);
         $this->handleMessageWithLinks($messageTxt);
