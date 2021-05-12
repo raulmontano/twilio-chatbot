@@ -305,7 +305,7 @@ class TwilioConnector extends ChatbotConnector
     			$this->session->set('conversationStarted', FALSE);
 
     			//FIXME enviar a archivo de configuracion
-    			$showWelcomeMenu = 'Quiero más información de ContinuaPro';
+    			$showWelcomeMenu = 'ver menu de inicio';
 
     			$startMessage = ['message' => $showWelcomeMenu];
 
