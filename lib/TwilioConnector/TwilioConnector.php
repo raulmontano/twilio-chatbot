@@ -13,6 +13,8 @@ use Inbenta\TwilioConnector\Helpers\Helper;
 
 use Inbenta\TwilioConnector\MessengerAPI\MessengerAPI;
 
+use Inbenta\TwilioConnector\ContinuaChatbotAPIClient;
+
 class TwilioConnector extends ChatbotConnector
 {
     public function __construct($appPath)
@@ -32,7 +34,7 @@ class TwilioConnector extends ChatbotConnector
             ];
 
             $this->session      = new SessionManager($this->getExternalIdFromRequest());
-            $this->botClient    = new ChatbotAPIClient($this->conf->get('api.key'), $this->conf->get('api.secret'), $this->session, $conversationConf);
+            $this->botClient    = new ContinuaChatbotAPIClient($this->conf->get('api.key'), $this->conf->get('api.secret'), $this->session, $conversationConf);
 
             // Try to get the translations from ExtraInfo and update the language manager
             $this->getTranslationsFromExtraInfo('twilio', 'translations');
@@ -297,6 +299,21 @@ class TwilioConnector extends ChatbotConnector
             // Send the messages received from ChatbotApi back to the external service
             $this->sendMessagesToExternal($botResponse);
         }
+
+        //FORCE START MENU
+        if($this->session->get('conversationStarted') === TRUE){
+    			$this->session->set('conversationStarted', FALSE);
+
+    			//FIXME enviar a archivo de configuracion
+    			$showWelcomeMenu = 'Quiero más información de ContinuaPro';
+
+    			$startMessage = ['message' => $showWelcomeMenu];
+
+    			$botResponse = $this->sendMessageToBot($startMessage);
+
+    			$this->sendMessagesToExternal($botResponse);
+    		}
+
         if ($needEscalation || $hasFormData) {
             $this->handleEscalation();
         }
