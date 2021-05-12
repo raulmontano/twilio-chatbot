@@ -300,25 +300,18 @@ class TwilioConnector extends ChatbotConnector
             $this->sendMessagesToExternal($botResponse);
         }
 
-        $file = __DIR__ . '/../../logs/conv' . '.' . date('Ymd') .'.log';
-        @file_put_contents($file, "Procesando conversacion" . PHP_EOL , FILE_APPEND | LOCK_EX);
-
         //FORCE START MENU
         if($this->session->get('conversationStarted') === TRUE){
     			$this->session->set('conversationStarted', FALSE);
 
-            @file_put_contents($file, "Mostrando menu inicio" . PHP_EOL , FILE_APPEND | LOCK_EX);
-
     			//FIXME enviar a archivo de configuracion
     			$showWelcomeMenu = 'ver menu de inicio';
-
     			$startMessage = ['message' => $showWelcomeMenu];
-
     			$botResponse = $this->sendMessageToBot($startMessage);
 
     			$this->sendMessagesToExternal($botResponse);
     		} else {
-          @file_put_contents($file, "NO SE MUESTRA menu inicio" . PHP_EOL , FILE_APPEND | LOCK_EX);
+          //no start menu
         }
 
         if ($needEscalation || $hasFormData) {
